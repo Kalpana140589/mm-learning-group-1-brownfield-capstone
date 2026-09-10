@@ -1,0 +1,12 @@
+{
+  "name": "shoplite-brownfield",
+  "version": "1.0.0",
+  "description": "Baseline brownfield e-commerce application for capstone",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
