@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopLite</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f6f7fb;
+        color: #111;
+      }
+
+      header {
+        background: #111827;
+        color: white;
+        padding: 16px 20px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px 20px;
+      }
+
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      input, select, button {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+      }
+
+      button {
+        border: 0;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #374151;
+      }
+      button.danger {
+        background: #dc2626;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .product-card h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+      }
+      .product-card .meta {
+        font-size: 12px;
+        color: #4b5563;
+        margin-bottom: 10px;
+      }
+
+      .product-card .price {
+        font-weight: bold;
+        margin: 10px 0;
+      }
+
+      .product-card .qty-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .product-card input[type="number"] {
+        width: 90px;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 900px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .muted {
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .list {
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eef2f7;
+      }
+
+      /* Simple modal */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal {
+        width: min(900px, 100%);
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eef2f7;
+      }
+      .modal-body {
+        padding: 14px;
+      }
+      .modal-backdrop.show {
+        display: flex;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: #eef2ff;
+        color: #3730a3;
+        border: 1px solid #e0e7ff;
+      }
+
+      .error {
+        color: #b91c1c;
+        font-size: 13px;
+      }
+      .success {
+        color: #047857;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <h1>ShopLite</h1>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Filters -->
+      <section class="card" aria-label="Product filters">
+        <div class="row">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search products by name…"
+            style="flex: 1; min-width: 240px"
+          />
+
+          <select id="categorySelect" style="min-width: 220px">
+            <option value="">All Categories</option>
+          </select>
+
+          <button id="clearFiltersBtn" class="secondary" type="button">
+            Clear
+          </button>
+
+          <button id="viewOrdersBtn" type="button">
+            View Order History
+          </button>
+        </div>
+        <div class="muted" style="margin-top: 8px">
+          Tip: use search + category together (e.g., “mouse” + “Electronics”).
+        </div>
+      </section>
+
+      <!-- Catalog + Cart/Checkout + Admin -->
+      <section class="two-col" style="margin-top: 12px">
+        <!-- Product Catalog -->
+        <section class="card" aria-label="Product catalog">
+          <div class="section-title">
+            <h2>Product Catalog</h2>
+            <span class="muted" id="catalogCount"></span>
+          </div>
+
+          <div id="catalogError" class="error" style="display:none; margin-top: 10px"></div>
+          <div id="catalogGrid" class="grid" style="margin-top: 12px"></div>
+        </section>
+
+        <!-- Cart + Admin -->
+        <section style="display: grid; gap: 12px">
+          <!-- Cart -->
+          <section class="card" aria-label="Cart and checkout">
+            <div class="section-title">
+              <h2>Cart</h2>
+              <button id="clearCartBtn" class="secondary" type="button">
+                Clear Cart
+              </button>
+            </div>
+
+            <ul id="cartList" class="list"></ul>
+            <div class="row" style="justify-content: space-between; margin-top: 12px">
+              <div>
+                <div class="muted">Total</div>
+                <div style="font-size: 18px; font-weight: bold" id="cartTotal">$0.00</div>
+              </div>
+              <button id="placeOrderBtn" type="button" disabled>Place Order</button>
+            </div>
+
+            <div id="orderMessage" style="margin-top: 10px"></div>
+          </section>
+
+          <!-- Admin Dashboard -->
+          <section class="card" aria-label="Admin dashboard">
+            <div class="section-title">
+              <h2>Admin Dashboard</h2>
+              <span class="pill">Demo (no auth)</span>
+            </div>
+
+            <form id="addProductForm" style="margin-top: 12px">
+              <div class="row">
+                <input id="adminName" type="text" placeholder="Product name" required style="flex: 1; min-width: 200px" />
+                <input id="adminPrice" type="number" step="0.01" min="0" placeholder="Price" required style="width: 140px" />
+                <input id="adminCategory" type="text" placeholder="Category" required style="width: 180px" />
+                <button type="submit">Add Product</button>
+              </div>
+              <div class="muted" style="margin-top: 8px">
+                Add requires: name, price, category. Delete products from the catalog cards.
+              </div>
+              <div id="adminMessage" style="margin-top: 10px"></div>
+            </form>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <!-- Order History Modal -->
+    <div id="ordersModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="ordersTitle">
+      <div class="modal">
+        <div class="modal-header">
+          <strong id="ordersTitle">Order History</strong>
+          <button id="closeOrdersBtn" class="secondary" type="button">Close</button>
+        </div>
+        <div class="modal-body">
+          <div id="ordersError" class="error" style="display:none;"></div>
+          <div id="ordersEmpty" class="muted" style="display:none;">
+            No orders yet. Place one from the cart.
+          </div>
+          <ul id="ordersList" class="list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
